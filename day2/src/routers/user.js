@@ -29,6 +29,15 @@ router.get('/users/me', auth, async (req, res) => {
     res.send(req.user)
 })
 
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find({})
+        res.send(users)
+    } catch(e) {
+        res.status(500).send()
+    }
+})
+
 router.get('/users/:id', async (req, res) => {
     const _id = req.params.id
 
@@ -63,7 +72,7 @@ router.patch('/users/:id', async (req, res) => {
         if(!user) {
             return res.status(404).send()
         }
-        res.send(user)
+        res.send('updated successfully')
     } catch (e) {
         res.status(400).send(e)
     }
@@ -76,7 +85,7 @@ router.delete('/users/:id', async (req, res) => {
         if(!user) {
             return res.status(404).send()
         }
-        res.send(user)
+        res.send('user deleted successfully')
     } catch (e) {
         res.status(400).send(e)
     }
