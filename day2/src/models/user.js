@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    role: {
+        type: String,
+        default: "member"
+    },
     address: [{
         houseNo: {
             type: String,

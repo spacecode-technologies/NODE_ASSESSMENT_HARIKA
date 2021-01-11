@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+var zipcodes = require('zipcodes');
 
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
@@ -88,6 +89,33 @@ router.delete('/users/:id', async (req, res) => {
         res.send('user deleted successfully')
     } catch (e) {
         res.status(400).send(e)
+    }
+})
+
+router.get('/pincode/:zip', async (req, res) => {
+    try {
+        var hills = zipcodes.lookup(req.params.zip);
+        res.send(hills)
+    } catch(e) {
+        res.status(500).send()
+    }
+})
+
+router.get('/user/:id', async (req, res) => {
+    const _id = req.params.id
+
+    try {
+        const user = await User.findById(_id)
+
+        if(user.role === 'admin') {
+            const users = await User.find({})
+            res.send(users)
+        }
+        else{
+            res.send(user)
+        }
+    } catch(e) {
+        res.status(500).send()
     }
 })
 
