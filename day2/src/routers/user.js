@@ -127,25 +127,30 @@ router.get('/sheet', async (req, res, next) => {
         const workbook = new ExcelJs.Workbook();
         const worksheet = workbook.addWorksheet('users');
         worksheet.columns = [
-            {header: 'name', key: 'name', width: 10},
-            {header: 'email', key: 'email', width: 10},
-            {header: 'password', key: 'password', width: 10},
-            {header: 'age', key: 'age', width: 10},
-            {header: 'role', key: 'role', width: 10},
-            {header: 'address', key: 'address', width: 10},
-            {header: 'company', key: 'company', width: 10},
+            {header: 'Name', key: 'name', width: 10},
+            {header: 'Email', key: 'email', width: 10},
+            {header: 'Password', key: 'password', width: 10},
+            {header: 'Age', key: 'age', width: 10},
+            {header: 'Role', key: 'role', width: 10},
+            {header: 'Address', key: 'address', width: 50},
+            {header: 'Company', key: 'company', width: 10},
         ];
-        let count = 1;
-        users.forEach(user => {
-            (user).s_no = count;
-            worksheet.addRow(user);
-            count += 1;
-        });
+        worksheet.addRows(users);
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=" + "users.xlsx"
+        );
         worksheet.getRow(1).eachCell((cell) => {
             cell.font = {bold: true};
         });
-        const data = await workbook.xlsx.writeFile('users.xlsx')
-        res.send('excel sheet saved');
+        return workbook.xlsx.write(res).then(function () {
+            res.status(200).end();
+        });
     } catch (e) {
         res.status(500).send(e);
     }

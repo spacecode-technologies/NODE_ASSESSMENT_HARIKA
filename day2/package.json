@@ -21,5 +21,6 @@
     "nodemon": "^2.0.7",
     "validator": "^13.5.2",
     "zipcodes": "^8.0.0"
-  }
+  },
+  "devDependencies": {}
 }
