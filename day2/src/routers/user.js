@@ -3,6 +3,8 @@ const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 var zipcodes = require('zipcodes');
+const ExcelJs = require('exceljs');
+const moment = require('moment')
 
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
@@ -118,5 +120,35 @@ router.get('/user/:id', async (req, res) => {
         res.status(500).send()
     }
 })
+
+router.get('/sheet', async (req, res, next) => {
+    try {
+        const users = await User.find({});
+        const workbook = new ExcelJs.Workbook();
+        const worksheet = workbook.addWorksheet('users');
+        worksheet.columns = [
+            {header: 'name', key: 'name', width: 10},
+            {header: 'email', key: 'email', width: 10},
+            {header: 'password', key: 'password', width: 10},
+            {header: 'age', key: 'age', width: 10},
+            {header: 'role', key: 'role', width: 10},
+            {header: 'address', key: 'address', width: 10},
+            {header: 'company', key: 'company', width: 10},
+        ];
+        let count = 1;
+        users.forEach(user => {
+            (user).s_no = count;
+            worksheet.addRow(user);
+            count += 1;
+        });
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.font = {bold: true};
+        });
+        const data = await workbook.xlsx.writeFile('users.xlsx')
+        res.send('excel sheet saved');
+    } catch (e) {
+        res.status(500).send(e);
+    }
+});
 
 module.exports = router
